@@ -1,0 +1,3309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoomScope AI</title>
+
+  <style>
+    /* =========================================================
+   ROOMscope AI — SINGLE FILE FRONTEND
+   HTML + CSS + JavaScript
+========================================================= */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #08090d;
+      --bg2: #0d0f15;
+      --panel: #11141c;
+      --panel2: #151923;
+      --line: rgba(255, 255, 255, .085);
+
+      --text: #f5f6f8;
+      --muted: #9297a7;
+      --muted2: #686e7e;
+
+      --gold: #f2a93b;
+      --gold2: #ffd27d;
+      --goldSoft: rgba(242, 169, 59, .10);
+
+      --blue: #6d9cff;
+      --green: #45d49a;
+      --red: #ff6666;
+
+      --radius: 22px;
+    }
+
+    /* ---------------- BASE ---------------- */
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%,
+          rgba(242, 169, 59, .12),
+          transparent 27%),
+        radial-gradient(circle at 90% 80%,
+          rgba(109, 156, 255, .10),
+          transparent 30%),
+        var(--bg);
+
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .30;
+
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .018) 1px,
+          transparent 1px),
+        linear-gradient(90deg,
+          rgba(255, 255, 255, .018) 1px,
+          transparent 1px);
+
+      background-size: 42px 42px;
+
+      mask-image:
+        linear-gradient(to bottom,
+          black,
+          transparent 90%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    /* ---------------- LAYOUT ---------------- */
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+    }
+
+    /* ---------------- HEADER ---------------- */
+
+    header {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 14px;
+
+      background:
+        linear-gradient(135deg,
+          var(--gold2),
+          var(--gold));
+
+      color: #171109;
+
+      font-size: 22px;
+      font-weight: 800;
+
+      box-shadow:
+        0 0 35px rgba(242, 169, 59, .20);
+    }
+
+    .brand h1 {
+      font-size: 19px;
+      letter-spacing: -.4px;
+    }
+
+    .brand p {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      padding: 9px 14px;
+
+      border: 1px solid var(--line);
+      border-radius: 999px;
+
+      background: rgba(255, 255, 255, .035);
+
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6c707c;
+    }
+
+    .status-dot.online {
+      background: var(--green);
+      box-shadow: 0 0 13px rgba(69, 212, 154, .75);
+    }
+
+    .status-dot.offline {
+      background: var(--red);
+      box-shadow: 0 0 13px rgba(255, 102, 102, .45);
+    }
+
+    /* ---------------- HERO ---------------- */
+
+    .hero {
+      text-align: center;
+      padding: 48px 0 42px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 7px 13px;
+
+      border: 1px solid rgba(242, 169, 59, .24);
+      border-radius: 999px;
+
+      background: var(--goldSoft);
+
+      color: var(--gold2);
+
+      font-size: 11px;
+      font-weight: 700;
+
+      letter-spacing: 1.3px;
+    }
+
+    .hero h2 {
+      margin-top: 18px;
+
+      font-size:
+        clamp(35px, 5.5vw, 61px);
+
+      line-height: 1.02;
+
+      letter-spacing: -2.7px;
+    }
+
+    .hero h2 span {
+      color: var(--gold);
+    }
+
+    .hero p {
+      max-width: 670px;
+      margin: 18px auto 0;
+
+      color: var(--muted);
+
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ---------------- MAIN ---------------- */
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+
+      background:
+        linear-gradient(145deg,
+          rgba(20, 23, 32, .96),
+          rgba(12, 14, 20, .96));
+
+      border-radius: var(--radius);
+
+      box-shadow:
+        0 25px 80px rgba(0, 0, 0, .28);
+
+      backdrop-filter: blur(18px);
+    }
+
+    /* ---------------- FORM PANEL ---------------- */
+
+    .form-panel {
+      padding: 26px;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 25px;
+    }
+
+    .panel-heading h3 {
+      font-size: 17px;
+    }
+
+    .panel-heading small {
+      color: var(--muted2);
+      font-size: 11px;
+    }
+
+    /* ---------------- GROUP ---------------- */
+
+    .group {
+      border: 0;
+      margin: 0 0 25px;
+      padding: 0;
+    }
+
+    .group:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .group legend {
+      width: 100%;
+
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+
+      border-bottom: 1px solid var(--line);
+
+      color: var(--gold2);
+
+      font-size: 11px;
+      font-weight: 800;
+
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    /* ---------------- FIELDS ---------------- */
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field label {
+      display: block;
+
+      margin-bottom: 8px;
+
+      color: #c3c6d0;
+
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .label-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .label-line label {
+      margin-bottom: 0;
+    }
+
+    .range-info {
+      color: var(--muted2);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    /* ---------------- TEXT / NUMBER INPUT ---------------- */
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+
+      min-height: 45px;
+
+      border: 1px solid var(--line);
+      border-radius: 12px;
+
+      outline: none;
+
+      background: #0b0d12;
+
+      color: var(--text);
+
+      padding: 11px 13px;
+
+      font-size: 13px;
+
+      transition:
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder {
+      color: #555b68;
+    }
+
+    input[type="text"]:hover,
+    input[type="number"]:hover {
+      border-color: rgba(255, 255, 255, .14);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: rgba(242, 169, 59, .65);
+
+      background: #0e1016;
+
+      box-shadow:
+        0 0 0 3px rgba(242, 169, 59, .07);
+    }
+
+    /* ---------------- NEIGHBOURHOOD ---------------- */
+
+    .neighbourhood-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+
+      color: var(--muted2);
+
+      pointer-events: none;
+    }
+
+    .neighbourhood-hint {
+      margin-top: 7px;
+
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      color: var(--muted2);
+
+      font-size: 10px;
+    }
+
+    .neighbourhood-hint strong {
+      color: var(--gold);
+    }
+
+    /* ---------------- BOROUGH BUTTONS ---------------- */
+
+    .boroughs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .borough {
+      min-height: 43px;
+
+      border: 1px solid var(--line);
+      border-radius: 11px;
+
+      background: #0b0d12;
+
+      color: var(--muted);
+
+      cursor: pointer;
+
+      font-size: 11px;
+      font-weight: 600;
+
+      transition: .18s ease;
+    }
+
+    .borough:hover {
+      border-color: rgba(242, 169, 59, .4);
+      color: var(--text);
+    }
+
+    .borough.active {
+      border-color: var(--gold);
+
+      color: var(--gold2);
+
+      background:
+        linear-gradient(135deg,
+          rgba(242, 169, 59, .14),
+          rgba(242, 169, 59, .05));
+
+      box-shadow:
+        inset 0 0 20px rgba(242, 169, 59, .04),
+        0 0 20px rgba(242, 169, 59, .05);
+    }
+
+    /* ---------------- COORDINATES ---------------- */
+
+    .coord-note {
+      margin-top: 8px;
+
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+
+      color: var(--muted2);
+
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .coord-note span {
+      color: var(--blue);
+    }
+
+    /* ---------------- SLIDER FIELD ---------------- */
+
+    .slider-field {
+      margin-bottom: 21px;
+    }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 9px;
+    }
+
+    .slider-top label {
+      margin: 0;
+    }
+
+    .slider-value {
+      color: var(--gold2);
+
+      font-size: 12px;
+      font-weight: 800;
+
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* slider */
+
+    input[type="range"] {
+      width: 100%;
+
+      height: 5px;
+
+      appearance: none;
+      -webkit-appearance: none;
+
+      border-radius: 999px;
+
+      outline: none;
+
+      background: #292d37;
+
+      cursor: pointer;
+
+      margin: 2px 0 11px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+
+      width: 17px;
+      height: 17px;
+
+      border-radius: 50%;
+
+      background: var(--gold);
+
+      border: 3px solid #151820;
+
+      box-shadow:
+        0 0 0 1px var(--gold),
+        0 0 15px rgba(242, 169, 59, .35);
+
+      transition: .15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.13);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+
+      border-radius: 50%;
+
+      background: var(--gold);
+
+      border: 3px solid #151820;
+
+      box-shadow:
+        0 0 0 1px var(--gold);
+    }
+
+    .number-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .number-control input[type="number"] {
+      max-width: 155px;
+    }
+
+    .unit {
+      color: var(--muted2);
+      font-size: 11px;
+    }
+
+    /* range guide */
+
+    .range-guide {
+      display: flex;
+      justify-content: space-between;
+
+      margin-top: 7px;
+
+      color: #565c69;
+
+      font-size: 9px;
+    }
+
+    /* ---------------- SUBMIT ---------------- */
+
+    .submit-area {
+      margin-top: 25px;
+    }
+
+    .predict-btn {
+      width: 100%;
+
+      min-height: 51px;
+
+      border: 0;
+      border-radius: 13px;
+
+      cursor: pointer;
+
+      color: #171109;
+
+      background:
+        linear-gradient(135deg,
+          var(--gold2),
+          var(--gold));
+
+      font-size: 14px;
+      font-weight: 800;
+
+      box-shadow:
+        0 14px 35px rgba(242, 169, 59, .14);
+
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        opacity .18s ease;
+    }
+
+    .predict-btn:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 18px 42px rgba(242, 169, 59, .24);
+    }
+
+    .predict-btn:active {
+      transform: translateY(0);
+    }
+
+    .predict-btn:disabled {
+      opacity: .55;
+      cursor: wait;
+      transform: none;
+    }
+
+    .button-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .button-spinner {
+      display: none;
+
+      width: 15px;
+      height: 15px;
+
+      border: 2px solid rgba(23, 17, 9, .3);
+      border-top-color: #171109;
+
+      border-radius: 50%;
+
+      animation: spin .7s linear infinite;
+    }
+
+    .predict-btn.loading .button-spinner {
+      display: block;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ---------------- ERRORS ---------------- */
+
+    .field-error {
+      min-height: 14px;
+
+      margin-top: 6px;
+
+      color: var(--red);
+
+      font-size: 10px;
+    }
+
+    .general-error {
+      display: none;
+
+      margin-top: 13px;
+
+      padding: 12px;
+
+      border: 1px solid rgba(255, 102, 102, .2);
+
+      border-radius: 11px;
+
+      background: rgba(255, 102, 102, .07);
+
+      color: #ff9b9b;
+
+      font-size: 11px;
+
+      line-height: 1.5;
+    }
+
+    .general-error.show {
+      display: block;
+    }
+
+    /* ---------------- RESULT ---------------- */
+
+    .result-panel {
+      position: sticky;
+      top: 18px;
+
+      min-height: 620px;
+
+      padding: 28px;
+
+      overflow: hidden;
+    }
+
+    .result-panel::after {
+      content: "";
+
+      position: absolute;
+
+      width: 260px;
+      height: 260px;
+
+      right: -130px;
+      top: -130px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(circle,
+          rgba(242, 169, 59, .12),
+          transparent 65%);
+
+      pointer-events: none;
+    }
+
+    .result-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding-bottom: 19px;
+
+      border-bottom: 1px solid var(--line);
+
+      position: relative;
+      z-index: 2;
+    }
+
+    .result-heading h3 {
+      font-size: 17px;
+    }
+
+    .result-heading span {
+      color: var(--muted2);
+      font-size: 10px;
+    }
+
+    /* ---------------- IDLE ---------------- */
+
+    .result-state {
+      min-height: 520px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      position: relative;
+      z-index: 1;
+    }
+
+    .idle-icon {
+      width: 70px;
+      height: 70px;
+
+      display: grid;
+      place-items: center;
+
+      border: 1px dashed #505563;
+
+      border-radius: 50%;
+
+      color: #747a89;
+
+      font-size: 28px;
+
+      margin-bottom: 20px;
+    }
+
+    .result-state h4 {
+      color: #dedfe4;
+
+      font-size: 16px;
+
+      margin-bottom: 8px;
+    }
+
+    .result-state p {
+      max-width: 270px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.65;
+    }
+
+    /* ---------------- LOADING ---------------- */
+
+    .loading-state {
+      display: none;
+
+      min-height: 520px;
+
+      align-items: center;
+      justify-content: center;
+
+      flex-direction: column;
+
+      text-align: center;
+    }
+
+    .loading-state.show {
+      display: flex;
+    }
+
+    .loading-ring {
+      width: 58px;
+      height: 58px;
+
+      border: 3px solid #2d313b;
+      border-top-color: var(--gold);
+
+      border-radius: 50%;
+
+      animation: spin .8s linear infinite;
+
+      margin-bottom: 20px;
+    }
+
+    .loading-state p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ---------------- RESULT CONTENT ---------------- */
+
+    .result-content {
+      display: none;
+
+      padding-top: 26px;
+
+      position: relative;
+      z-index: 2;
+    }
+
+    .result-content.show {
+      display: block;
+
+      animation:
+        resultIn .45s ease;
+    }
+
+    @keyframes resultIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .most-label {
+      color: var(--muted2);
+
+      font-size: 10px;
+      text-transform: uppercase;
+
+      letter-spacing: 1.2px;
+    }
+
+    .prediction {
+      margin-top: 8px;
+
+      color: var(--gold2);
+
+      font-size: 32px;
+      line-height: 1.15;
+
+      letter-spacing: -1px;
+    }
+
+    .confidence-card {
+      margin-top: 24px;
+
+      padding: 16px;
+
+      border: 1px solid var(--line);
+
+      border-radius: 15px;
+
+      background:
+        rgba(255, 255, 255, .025);
+    }
+
+    .confidence-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 10px;
+
+      font-size: 11px;
+    }
+
+    .confidence-head span:first-child {
+      color: var(--muted);
+    }
+
+    .confidence-head span:last-child {
+      color: var(--gold2);
+      font-weight: 800;
+    }
+
+    .progress {
+      height: 8px;
+
+      border-radius: 999px;
+
+      overflow: hidden;
+
+      background: #272b34;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+
+      border-radius: 999px;
+
+      background:
+        linear-gradient(90deg,
+          #d88315,
+          var(--gold2));
+
+      transition:
+        width 1s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .breakdown-title {
+      margin: 23px 0 15px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+    .probability {
+      margin-bottom: 16px;
+    }
+
+    .probability:last-child {
+      margin-bottom: 0;
+    }
+
+    .prob-head {
+      display: flex;
+      justify-content: space-between;
+
+      margin-bottom: 7px;
+
+      font-size: 11px;
+    }
+
+    .prob-head span:first-child {
+      color: #c9ccd4;
+    }
+
+    .prob-head span:last-child {
+      color: var(--gold2);
+      font-weight: 800;
+    }
+
+    .prob-track {
+      height: 7px;
+
+      border-radius: 999px;
+
+      overflow: hidden;
+
+      background: #252932;
+    }
+
+    .prob-fill {
+      width: 0;
+      height: 100%;
+
+      border-radius: 999px;
+
+      background:
+        linear-gradient(90deg,
+          #bd7111,
+          var(--gold));
+
+      transition:
+        width 1s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    /* ---------------- ERROR RESULT ---------------- */
+
+    .error-state {
+      display: none;
+
+      min-height: 520px;
+
+      align-items: center;
+      justify-content: center;
+
+      flex-direction: column;
+
+      text-align: center;
+    }
+
+    .error-state.show {
+      display: flex;
+    }
+
+    .error-icon {
+      width: 52px;
+      height: 52px;
+
+      display: grid;
+      place-items: center;
+
+      border: 1px solid rgba(255, 102, 102, .3);
+
+      border-radius: 50%;
+
+      color: var(--red);
+
+      margin-bottom: 17px;
+    }
+
+    .retry-btn {
+      width: auto;
+
+      margin-top: 17px;
+
+      padding: 9px 16px;
+
+      border: 1px solid var(--line);
+
+      border-radius: 10px;
+
+      background: #151821;
+
+      color: #ddd;
+
+      cursor: pointer;
+
+      font-size: 11px;
+    }
+
+    .retry-btn:hover {
+      border-color: rgba(242, 169, 59, .4);
+    }
+
+    /* ---------------- FOOTER ---------------- */
+
+    footer {
+      padding: 28px 0 35px;
+
+      text-align: center;
+
+      color: #555a67;
+
+      font-size: 10px;
+    }
+
+    /* ---------------- RESPONSIVE ---------------- */
+
+    @media(max-width:900px) {
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .result-panel {
+        position: relative;
+        top: auto;
+      }
+
+      .result-state,
+      .loading-state,
+      .error-state {
+        min-height: 380px;
+      }
+    }
+
+    @media(max-width:650px) {
+
+      .container {
+        width: min(100% - 20px, 1180px);
+      }
+
+      header {
+        padding: 16px 0;
+      }
+
+      .api-status {
+        padding: 7px 9px;
+      }
+
+      .api-status span:last-child {
+        display: none;
+      }
+
+      .hero {
+        padding: 35px 0;
+      }
+
+      .hero h2 {
+        font-size: 39px;
+        letter-spacing: -1.7px;
+      }
+
+      .hero p {
+        font-size: 13px;
+      }
+
+      .form-panel,
+      .result-panel {
+        padding: 19px;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .boroughs {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .number-control input[type="number"] {
+        max-width: none;
+      }
+
+      .prediction {
+        font-size: 27px;
+      }
+    }
+
+    @media(max-width:400px) {
+
+      .brand p {
+        display: none;
+      }
+
+      .boroughs {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <div class="container">
+
+    <!-- =====================================================
+     HEADER
+===================================================== -->
+
+    <header>
+
+      <div class="brand">
+
+        <div class="logo">⌂</div>
+
+        <div>
+          <h1>RoomScope AI</h1>
+          <p>Machine-learning room type predictor</p>
+        </div>
+
+      </div>
+
+
+      <div class="api-status">
+
+        <span class="status-dot" id="statusDot">
+        </span>
+
+        <span id="statusText">
+          Checking API...
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+     HERO
+===================================================== -->
+
+    <section class="hero">
+
+      <div class="eyebrow">
+        ✦ AI PROPERTY ANALYTICS
+      </div>
+
+      <h2>
+        Predict the
+        <span>room type.</span>
+      </h2>
+
+      <p>
+        Enter the listing details below. RoomScope sends the same
+        feature set expected by your FastAPI machine-learning pipeline
+        and returns the predicted room category with probabilities.
+      </p>
+
+    </section>
+
+
+    <!-- =====================================================
+     WORKSPACE
+===================================================== -->
+
+    <main class="workspace">
+
+
+      <!-- =====================================================
+     LEFT — FORM
+===================================================== -->
+
+      <section class="panel form-panel">
+
+        <div class="panel-heading">
+
+          <h3>Property information</h3>
+
+          <small>
+            10 model features
+          </small>
+
+        </div>
+
+
+        <form id="predictionForm" novalidate>
+
+
+          <!-- LOCATION -->
+
+          <fieldset class="group">
+
+            <legend>01 · Location</legend>
+
+
+            <!-- BOROUGH -->
+
+            <div class="field">
+
+              <label>
+                Neighbourhood group
+              </label>
+
+              <div class="boroughs" id="boroughs">
+
+                <button type="button" class="borough" data-borough="Bronx">
+                  Bronx
+                </button>
+
+                <button type="button" class="borough" data-borough="Brooklyn">
+                  Brooklyn
+                </button>
+
+                <button type="button" class="borough active" data-borough="Manhattan">
+                  Manhattan
+                </button>
+
+                <button type="button" class="borough" data-borough="Queens">
+                  Queens
+                </button>
+
+                <button type="button" class="borough" data-borough="Staten Island">
+                  Staten Island
+                </button>
+
+              </div>
+
+              <div class="field-error" id="err-borough">
+              </div>
+
+            </div>
+
+
+            <!-- NEIGHBOURHOOD -->
+
+            <div class="field">
+
+              <div class="label-line">
+
+                <label for="neighbourhood">
+                  Neighbourhood
+                </label>
+
+                <span class="range-info">
+                  Model vocabulary
+                </span>
+
+              </div>
+
+
+              <div class="neighbourhood-wrap">
+
+                <input type="text" id="neighbourhood" list="neighbourhoodList" autocomplete="off"
+                  placeholder="Start typing a neighbourhood..." required>
+
+
+
+              </div>
+
+
+              <datalist id="neighbourhoodList"></datalist>
+
+
+              <div class="neighbourhood-hint">
+                <strong>Tip:</strong>
+                Select a value from the suggestions when possible.
+              </div>
+
+
+              <div class="field-error" id="err-neighbourhood">
+              </div>
+
+            </div>
+
+
+            <!-- LAT / LONG -->
+
+            <div class="field-row">
+
+              <div class="field">
+
+                <div class="label-line">
+
+                  <label for="latitude">
+                    Latitude
+                  </label>
+
+                  <span class="range-info">
+                    −90 to 90
+                  </span>
+
+                </div>
+
+                <input type="number" id="latitude" step="0.0001" min="-90" max="90" value="40.7831" required>
+
+                <div class="field-error" id="err-latitude">
+                </div>
+
+              </div>
+
+
+              <div class="field">
+
+                <div class="label-line">
+
+                  <label for="longitude">
+                    Longitude
+                  </label>
+
+                  <span class="range-info">
+                    −180 to 180
+                  </span>
+
+                </div>
+
+                <input type="number" id="longitude" step="0.0001" min="-180" max="180" value="-73.9712" required>
+
+                <div class="field-error" id="err-longitude">
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+          </fieldset>
+
+
+          <!-- PRICE & STAY -->
+
+          <fieldset class="group">
+
+            <legend>02 · Price & stay</legend>
+
+
+            <!-- PRICE -->
+
+            <div class="field slider-field">
+
+              <div class="slider-top">
+
+                <label for="price">
+                  Price per night
+                </label>
+
+                <span class="slider-value" id="priceValue">
+                  $150
+                </span>
+
+              </div>
+
+
+              <input type="range" id="priceSlider" min="0" max="1000" step="1" value="150">
+
+
+              <div class="number-control">
+
+                <input type="number" id="price" min="0" step="1" value="150" required>
+
+                <span class="unit">
+                  USD / night
+                </span>
+
+              </div>
+
+
+              <div class="range-guide">
+                <span>$0</span>
+                <span>UI guide: $1,000+</span>
+              </div>
+
+
+              <div class="field-error" id="err-price">
+              </div>
+
+            </div>
+
+
+            <!-- MINIMUM NIGHTS -->
+
+            <div class="field slider-field">
+
+              <div class="slider-top">
+
+                <label for="minimum_nights">
+                  Minimum nights
+                </label>
+
+                <span class="slider-value" id="minimumValue">
+                  3 nights
+                </span>
+
+              </div>
+
+
+              <input type="range" id="minimumSlider" min="1" max="365" step="1" value="3">
+
+
+              <div class="number-control">
+
+                <input type="number" id="minimum_nights" min="1" max="365" step="1" value="3" required>
+
+                <span class="unit">
+                  nights
+                </span>
+
+              </div>
+
+
+              <div class="range-guide">
+                <span>1</span>
+                <span>365</span>
+              </div>
+
+
+              <div class="field-error" id="err-minimum_nights">
+              </div>
+
+            </div>
+
+
+            <!-- AVAILABILITY -->
+
+            <div class="field slider-field">
+
+              <div class="slider-top">
+
+                <label for="availability_365">
+                  Availability
+                </label>
+
+                <span class="slider-value" id="availabilityValue">
+                  180 days
+                </span>
+
+              </div>
+
+
+              <input type="range" id="availabilitySlider" min="0" max="365" step="1" value="180">
+
+
+              <div class="number-control">
+
+                <input type="number" id="availability_365" min="0" max="365" step="1" value="180" required>
+
+                <span class="unit">
+                  days / year
+                </span>
+
+              </div>
+
+
+              <div class="range-guide">
+                <span>0</span>
+                <span>365 days</span>
+              </div>
+
+
+              <div class="field-error" id="err-availability_365">
+              </div>
+
+            </div>
+
+          </fieldset>
+
+
+          <!-- REVIEWS & HOST -->
+
+          <fieldset class="group">
+
+            <legend>03 · Reviews & host</legend>
+
+
+            <!-- REVIEWS -->
+
+            <div class="field slider-field">
+
+              <div class="slider-top">
+
+                <label for="number_of_reviews">
+                  Number of reviews
+                </label>
+
+                <span class="slider-value" id="reviewsValue">
+                  12
+                </span>
+
+              </div>
+
+
+              <input type="range" id="reviewsSlider" min="0" max="500" step="1" value="12">
+
+
+              <div class="number-control">
+
+                <input type="number" id="number_of_reviews" min="0" step="1" value="12" required>
+
+                <span class="unit">
+                  total reviews
+                </span>
+
+              </div>
+
+
+              <div class="range-guide">
+                <span>0</span>
+                <span>500+ UI guide</span>
+              </div>
+
+
+              <div class="field-error" id="err-number_of_reviews">
+              </div>
+
+            </div>
+
+
+            <!-- REVIEWS PER MONTH -->
+
+            <div class="field slider-field">
+
+              <div class="slider-top">
+
+                <label for="reviews_per_month">
+                  Reviews per month
+                </label>
+
+                <span class="slider-value" id="rpmValue">
+                  0.8
+                </span>
+
+              </div>
+
+
+              <input type="range" id="rpmSlider" min="0" max="20" step="0.1" value="0.8">
+
+
+              <div class="number-control">
+
+                <input type="number" id="reviews_per_month" min="0" step="0.01" value="0.8" required>
+
+                <span class="unit">
+                  reviews / month
+                </span>
+
+              </div>
+
+
+              <div class="range-guide">
+                <span>0</span>
+                <span>20+ UI guide</span>
+              </div>
+
+
+              <div class="field-error" id="err-reviews_per_month">
+              </div>
+
+            </div>
+
+
+            <!-- HOST LISTINGS -->
+
+            <div class="field slider-field">
+
+              <div class="slider-top">
+
+                <label for="calculated_host_listings_count">
+                  Host's total listings
+                </label>
+
+                <span class="slider-value" id="hostValue">
+                  1
+                </span>
+
+              </div>
+
+
+              <input type="range" id="hostSlider" min="0" max="50" step="1" value="1">
+
+
+              <div class="number-control">
+
+                <input type="number" id="calculated_host_listings_count" min="0" step="1" value="1" required>
+
+                <span class="unit">
+                  listings
+                </span>
+
+              </div>
+
+
+              <div class="range-guide">
+                <span>0</span>
+                <span>50+ UI guide</span>
+              </div>
+
+
+              <div class="field-error" id="err-calculated_host_listings_count">
+              </div>
+
+            </div>
+
+          </fieldset>
+
+
+          <!-- SUBMIT -->
+
+          <div class="submit-area">
+
+            <button type="submit" class="predict-btn" id="predictBtn">
+
+              <span class="button-content">
+
+                <span id="buttonText">
+                  Reveal room type →
+                </span>
+
+                <span class="button-spinner">
+                </span>
+
+              </span>
+
+            </button>
+
+
+            <div class="general-error" id="generalError">
+            </div>
+
+          </div>
+
+
+        </form>
+
+      </section>
+
+
+      <!-- =====================================================
+     RIGHT — RESULT
+===================================================== -->
+
+      <section class="panel result-panel">
+
+        <div class="result-heading">
+
+          <h3>AI prediction</h3>
+
+          <span>
+            LIVE MODEL OUTPUT
+          </span>
+
+        </div>
+
+
+        <!-- IDLE -->
+
+        <div class="result-state" id="idleState">
+
+          <div class="idle-icon">
+            ＋
+          </div>
+
+          <h4>
+            Ready when you are
+          </h4>
+
+          <p>
+            Fill in the property details and let your
+            machine-learning model reveal the most likely room type.
+          </p>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div class="loading-state" id="loadingState">
+
+          <div class="loading-ring"></div>
+
+          <p>
+            Asking the model...
+          </p>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div class="error-state" id="errorState">
+
+          <div class="error-icon">
+            !
+          </div>
+
+          <h4>
+            Couldn't reach the API
+          </h4>
+
+          <p>
+            Make sure FastAPI is running at
+            <b>127.0.0.1:8000</b>.
+          </p>
+
+          <button type="button" class="retry-btn" id="retryBtn">
+            Try again
+          </button>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div class="result-content" id="resultContent">
+
+          <div class="most-label">
+            Most likely room type
+          </div>
+
+          <div class="prediction" id="prediction">
+            —
+          </div>
+
+
+          <!-- CONFIDENCE -->
+
+          <div class="confidence-card">
+
+            <div class="confidence-head">
+
+              <span>
+                Prediction confidence
+              </span>
+
+              <span id="confidence">
+                0%
+              </span>
+
+            </div>
+
+
+            <div class="progress">
+
+              <div class="progress-fill" id="confidenceBar">
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- BREAKDOWN -->
+
+          <div class="breakdown-title">
+            Probability breakdown
+          </div>
+
+
+          <!-- ENTIRE -->
+
+          <div class="probability">
+
+            <div class="prob-head">
+
+              <span>
+                Entire home/apt
+              </span>
+
+              <span id="prob0">
+                0%
+              </span>
+
+            </div>
+
+            <div class="prob-track">
+
+              <div class="prob-fill" id="bar0">
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- PRIVATE -->
+
+          <div class="probability">
+
+            <div class="prob-head">
+
+              <span>
+                Private room
+              </span>
+
+              <span id="prob1">
+                0%
+              </span>
+
+            </div>
+
+            <div class="prob-track">
+
+              <div class="prob-fill" id="bar1">
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- SHARED -->
+
+          <div class="probability">
+
+            <div class="prob-head">
+
+              <span>
+                Shared room
+              </span>
+
+              <span id="prob2">
+                0%
+              </span>
+
+            </div>
+
+            <div class="prob-track">
+
+              <div class="prob-fill" id="bar2">
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <footer style="font-size: 12px; font-weight: bold;">
+        Made with ❤️ By Rahul · Room Type Prediction
+    </footer>
+
+  </div>
+
+
+  <script>
+
+    /* =========================================================
+       CONFIG
+    ========================================================= */
+
+    const API_BASE = "http://127.0.0.1:8000";
+
+
+    /* =========================================================
+       MODEL VOCABULARY
+       This is the neighbourhood list already present in your
+       frontend/model setup.
+    ========================================================= */
+
+    const NEIGHBOURHOODS = [
+      "Allerton",
+      "Arden Heights",
+      "Arrochar",
+      "Arverne",
+      "Astoria",
+      "Bath Beach",
+      "Battery Park City",
+      "Bay Ridge",
+      "Bay Terrace",
+      "Bay Terrace, Staten Island",
+      "Baychester",
+      "Bayside",
+      "Bayswater",
+      "Bedford-Stuyvesant",
+      "Belle Harbor",
+      "Bellerose",
+      "Belmont",
+      "Bensonhurst",
+      "Bergen Beach",
+      "Boerum Hill",
+      "Borough Park",
+      "Breezy Point",
+      "Briarwood",
+      "Brighton Beach",
+      "Bronxdale",
+      "Brooklyn Heights",
+      "Brownsville",
+      "Bull's Head",
+      "Bushwick",
+      "Cambria Heights",
+      "Canarsie",
+      "Carroll Gardens",
+      "Castle Hill",
+      "Castleton Corners",
+      "Chelsea",
+      "Chinatown",
+      "City Island",
+      "Civic Center",
+      "Claremont Village",
+      "Clason Point",
+      "Clifton",
+      "Clinton Hill",
+      "Co-op City",
+      "Cobble Hill",
+      "College Point",
+      "Columbia St",
+      "Concord",
+      "Concourse",
+      "Concourse Village",
+      "Coney Island",
+      "Corona",
+      "Crown Heights",
+      "Cypress Hills",
+      "DUMBO",
+      "Ditmars Steinway",
+      "Dongan Hills",
+      "Douglaston",
+      "Downtown Brooklyn",
+      "Dyker Heights",
+      "East Elmhurst",
+      "East Flatbush",
+      "East Harlem",
+      "East Morrisania",
+      "East New York",
+      "Eastchester",
+      "Edenwald",
+      "Edgemere",
+      "Elmhurst",
+      "Eltingville",
+      "Emerson Hill",
+      "Far Rockaway",
+      "Fieldston",
+      "Financial District",
+      "Flatbush",
+      "Flatiron District",
+      "Flatlands",
+      "Flushing",
+      "Fordham",
+      "Forest Hills",
+      "Fort Greene",
+      "Fort Hamilton",
+      "Fresh Meadows",
+      "Glendale",
+      "Gowanus",
+      "Gramercy",
+      "Graniteville",
+      "Grant City",
+      "Gravesend",
+      "Great Kills",
+      "Greenpoint",
+      "Greenwich Village",
+      "Grymes Hill",
+      "Harlem",
+      "Hell's Kitchen",
+      "Highbridge",
+      "Hollis",
+      "Holliswood",
+      "Howard Beach",
+      "Howland Hook",
+      "Huguenot",
+      "Hunts Point",
+      "Inwood",
+      "Jackson Heights",
+      "Jamaica",
+      "Jamaica Estates",
+      "Jamaica Hills",
+      "Kensington",
+      "Kew Gardens",
+      "Kew Gardens Hills",
+      "Kingsbridge",
+      "Kips Bay",
+      "Laurelton",
+      "Little Italy",
+      "Little Neck",
+      "Long Island City",
+      "Longwood",
+      "Lower East Side",
+      "Manhattan Beach",
+      "Marble Hill",
+      "Mariners Harbor",
+      "Maspeth",
+      "Melrose",
+      "Middle Village",
+      "Midland Beach",
+      "Midtown",
+      "Midwood",
+      "Mill Basin",
+      "Morningside Heights",
+      "Morris Heights",
+      "Morris Park",
+      "Morrisania",
+      "Mott Haven",
+      "Mount Eden",
+      "Mount Hope",
+      "Murray Hill",
+      "Navy Yard",
+      "Neponsit",
+      "New Brighton",
+      "New Dorp",
+      "New Dorp Beach",
+      "New Springville",
+      "NoHo",
+      "Nolita",
+      "North Riverdale",
+      "Norwood",
+      "Oakwood",
+      "Olinville",
+      "Ozone Park",
+      "Park Slope",
+      "Parkchester",
+      "Pelham Bay",
+      "Pelham Gardens",
+      "Port Morris",
+      "Port Richmond",
+      "Prince's Bay",
+      "Prospect Heights",
+      "Prospect-Lefferts Gardens",
+      "Queens Village",
+      "Randall Manor",
+      "Red Hook",
+      "Rego Park",
+      "Richmond Hill",
+      "Ridgewood",
+      "Riverdale",
+      "Rockaway Beach",
+      "Roosevelt Island",
+      "Rosebank",
+      "Rosedale",
+      "Rossville",
+      "Schuylerville",
+      "Sea Gate",
+      "Sheepshead Bay",
+      "Shore Acres",
+      "Silver Lake",
+      "SoHo",
+      "Soundview",
+      "South Beach",
+      "South Ozone Park",
+      "South Slope",
+      "Springfield Gardens",
+      "Spuyten Duyvil",
+      "St. Albans",
+      "St. George",
+      "Stapleton",
+      "Stuyvesant Town",
+      "Sunnyside",
+      "Sunset Park",
+      "Theater District",
+      "Throgs Neck",
+      "Todt Hill",
+      "Tompkinsville",
+      "Tottenville",
+      "Tremont",
+      "Tribeca",
+      "Two Bridges",
+      "Unionport",
+      "University Heights",
+      "Upper East Side",
+      "Upper West Side",
+      "Van Nest",
+      "Vinegar Hill",
+      "Wakefield",
+      "Washington Heights",
+      "West Brighton",
+      "West Farms",
+      "West Village",
+      "Westchester Square",
+      "Westerleigh",
+      "Whitestone",
+      "Williamsbridge",
+      "Williamsburg",
+      "Willowbrook",
+      "Windsor Terrace",
+      "Woodhaven",
+      "Woodlawn",
+      "Woodside"
+    ];
+
+
+    /* =========================================================
+       BOROUGH COORDINATES
+    ========================================================= */
+
+    const BOROUGH_CENTROIDS = {
+
+      "Bronx":
+        [40.8448, -73.8648],
+
+      "Brooklyn":
+        [40.6782, -73.9442],
+
+      "Manhattan":
+        [40.7831, -73.9712],
+
+      "Queens":
+        [40.7282, -73.7949],
+
+      "Staten Island":
+        [40.5795, -74.1502]
+
+    };
+
+
+    /* =========================================================
+       DOM
+    ========================================================= */
+
+    const $ = id =>
+      document.getElementById(id);
+
+
+    const form =
+      $("predictionForm");
+
+    const statusDot =
+      $("statusDot");
+
+    const statusText =
+      $("statusText");
+
+    const neighbourhood =
+      $("neighbourhood");
+
+    const neighbourhoodList =
+      $("neighbourhoodList");
+
+    const latitude =
+      $("latitude");
+
+    const longitude =
+      $("longitude");
+
+    const predictBtn =
+      $("predictBtn");
+
+    const buttonText =
+      $("buttonText");
+
+    const generalError =
+      $("generalError");
+
+    const idleState =
+      $("idleState");
+
+    const loadingState =
+      $("loadingState");
+
+    const errorState =
+      $("errorState");
+
+    const resultContent =
+      $("resultContent");
+
+
+    /* =========================================================
+       INITIALISE NEIGHBOURHOOD SUGGESTIONS
+    ========================================================= */
+
+    NEIGHBOURHOODS.forEach(name => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = name;
+
+      neighbourhoodList.appendChild(option);
+
+    });
+
+
+    /* =========================================================
+       BOROUGH SELECTION
+    ========================================================= */
+
+    let selectedBorough = "Manhattan";
+
+
+    document
+      .querySelectorAll(".borough")
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(".borough")
+              .forEach(btn =>
+                btn.classList.remove("active")
+              );
+
+
+            button.classList.add("active");
+
+
+            selectedBorough =
+              button.dataset.borough;
+
+
+            /*
+             * Automatically set a sensible starting
+             * latitude/longitude for selected borough.
+             */
+
+            const coords =
+              BOROUGH_CENTROIDS[selectedBorough];
+
+
+            if (coords) {
+
+              latitude.value =
+                coords[0];
+
+              longitude.value =
+                coords[1];
+
+            }
+
+
+            clearFieldError("borough");
+
+          }
+        );
+
+      });
+
+
+    /* =========================================================
+       SLIDER ↔ NUMBER SYNCHRONISATION
+    ========================================================= */
+
+    function connectSlider(
+      sliderId,
+      numberId,
+      outputId,
+      formatter
+    ) {
+
+      const slider =
+        $(sliderId);
+
+      const number =
+        $(numberId);
+
+      const output =
+        $(outputId);
+
+
+      function syncFromSlider() {
+
+        number.value =
+          slider.value;
+
+        output.textContent =
+          formatter(slider.value);
+
+      }
+
+
+      function syncFromNumber() {
+
+        if (number.value === "")
+          return;
+
+
+        let value =
+          Number(number.value);
+
+
+        const min =
+          Number(slider.min);
+
+        const max =
+          Number(slider.max);
+
+
+        /*
+         * Keep slider inside its visual range.
+         */
+
+        if (value < min)
+          value = min;
+
+        if (value > max)
+          value = max;
+
+
+        slider.value =
+          value;
+
+        output.textContent =
+          formatter(value);
+
+      }
+
+
+      slider.addEventListener(
+        "input",
+        syncFromSlider
+      );
+
+
+      number.addEventListener(
+        "input",
+        syncFromNumber
+      );
+
+
+      /*
+       * Initial state
+       */
+
+      syncFromSlider();
+
+    }
+
+
+    /* PRICE */
+
+    connectSlider(
+      "priceSlider",
+      "price",
+      "priceValue",
+      value =>
+        "$" + Number(value).toFixed(0)
+    );
+
+
+    /* MINIMUM NIGHTS */
+
+    connectSlider(
+      "minimumSlider",
+      "minimum_nights",
+      "minimumValue",
+      value => {
+
+        const n =
+          Math.round(Number(value));
+
+        return n +
+          (n === 1
+            ? " night"
+            : " nights");
+
+      }
+    );
+
+
+    /* AVAILABILITY */
+
+    connectSlider(
+      "availabilitySlider",
+      "availability_365",
+      "availabilityValue",
+      value =>
+        Math.round(Number(value)) +
+        " days"
+    );
+
+
+    /* REVIEWS */
+
+    connectSlider(
+      "reviewsSlider",
+      "number_of_reviews",
+      "reviewsValue",
+      value =>
+        Math.round(Number(value))
+    );
+
+
+    /* REVIEWS PER MONTH */
+
+    connectSlider(
+      "rpmSlider",
+      "reviews_per_month",
+      "rpmValue",
+      value =>
+        Number(value).toFixed(1)
+    );
+
+
+    /* HOST */
+
+    connectSlider(
+      "hostSlider",
+      "calculated_host_listings_count",
+      "hostValue",
+      value =>
+        Math.round(Number(value))
+    );
+
+
+    /* =========================================================
+       VALIDATION HELPERS
+    ========================================================= */
+
+    function clearFieldError(name) {
+
+      const element =
+        $("err-" + name);
+
+      if (element)
+        element.textContent = "";
+
+    }
+
+
+    function setFieldError(
+      name,
+      message
+    ) {
+
+      const element =
+        $("err-" + name);
+
+      if (element)
+        element.textContent =
+          message;
+
+    }
+
+
+    /* =========================================================
+       BUILD PAYLOAD
+    ========================================================= */
+
+    function buildPayload() {
+
+      return {
+
+        latitude:
+          parseFloat(latitude.value),
+
+        longitude:
+          parseFloat(longitude.value),
+
+        price:
+          parseFloat(
+            $("price").value
+          ),
+
+        minimum_nights:
+          parseInt(
+            $("minimum_nights").value,
+            10
+          ),
+
+        number_of_reviews:
+          parseInt(
+            $("number_of_reviews").value,
+            10
+          ),
+
+        reviews_per_month:
+          parseFloat(
+            $("reviews_per_month").value
+          ),
+
+        calculated_host_listings_count:
+          parseInt(
+            $("calculated_host_listings_count").value,
+            10
+          ),
+
+        availability_365:
+          parseInt(
+            $("availability_365").value,
+            10
+          ),
+
+        neighbourhood_group:
+          selectedBorough,
+
+        neighbourhood:
+          neighbourhood.value.trim()
+
+      };
+
+    }
+
+
+    /* =========================================================
+       VALIDATE
+    ========================================================= */
+
+    function validate(payload) {
+
+      let valid = true;
+
+
+      /*
+       * Latitude
+       */
+
+      clearFieldError("latitude");
+
+      if (
+        Number.isNaN(payload.latitude) ||
+        payload.latitude < -90 ||
+        payload.latitude > 90
+      ) {
+
+        setFieldError(
+          "latitude",
+          "Enter a value between −90 and 90."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Longitude
+       */
+
+      clearFieldError("longitude");
+
+      if (
+        Number.isNaN(payload.longitude) ||
+        payload.longitude < -180 ||
+        payload.longitude > 180
+      ) {
+
+        setFieldError(
+          "longitude",
+          "Enter a value between −180 and 180."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Price
+       */
+
+      clearFieldError("price");
+
+      if (
+        Number.isNaN(payload.price) ||
+        payload.price < 0
+      ) {
+
+        setFieldError(
+          "price",
+          "Price must be 0 or greater."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Minimum nights
+       */
+
+      clearFieldError("minimum_nights");
+
+      if (
+        !Number.isInteger(payload.minimum_nights) ||
+        payload.minimum_nights < 1 ||
+        payload.minimum_nights > 365
+      ) {
+
+        setFieldError(
+          "minimum_nights",
+          "Allowed API range: 1–365 nights."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Reviews
+       */
+
+      clearFieldError("number_of_reviews");
+
+      if (
+        !Number.isInteger(
+          payload.number_of_reviews
+        ) ||
+        payload.number_of_reviews < 0
+      ) {
+
+        setFieldError(
+          "number_of_reviews",
+          "Number of reviews cannot be negative."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Reviews per month
+       */
+
+      clearFieldError("reviews_per_month");
+
+      if (
+        Number.isNaN(
+          payload.reviews_per_month
+        ) ||
+        payload.reviews_per_month < 0
+      ) {
+
+        setFieldError(
+          "reviews_per_month",
+          "Reviews/month must be 0 or greater."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Host listings
+       */
+
+      clearFieldError(
+        "calculated_host_listings_count"
+      );
+
+      if (
+        !Number.isInteger(
+          payload.calculated_host_listings_count
+        ) ||
+        payload.calculated_host_listings_count < 0
+      ) {
+
+        setFieldError(
+          "calculated_host_listings_count",
+          "Host listings cannot be negative."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Availability
+       */
+
+      clearFieldError(
+        "availability_365"
+      );
+
+      if (
+        !Number.isInteger(
+          payload.availability_365
+        ) ||
+        payload.availability_365 < 0 ||
+        payload.availability_365 > 365
+      ) {
+
+        setFieldError(
+          "availability_365",
+          "Allowed API range: 0–365 days."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Neighbourhood
+       */
+
+      clearFieldError(
+        "neighbourhood"
+      );
+
+      if (
+        !payload.neighbourhood
+      ) {
+
+        setFieldError(
+          "neighbourhood",
+          "Choose or enter a neighbourhood."
+        );
+
+        valid = false;
+
+      }
+
+
+      /*
+       * Borough
+       */
+
+      clearFieldError("borough");
+
+
+      if (!selectedBorough) {
+
+        setFieldError(
+          "borough",
+          "Select a borough."
+        );
+
+        valid = false;
+
+      }
+
+
+      return valid;
+
+    }
+
+
+    /* =========================================================
+       API STATUS
+    ========================================================= */
+
+    async function checkAPI() {
+
+      statusText.textContent =
+        "Checking API...";
+
+      statusDot.className =
+        "status-dot";
+
+
+      try {
+
+        const controller =
+          new AbortController();
+
+
+        const timeout =
+          setTimeout(
+            () => controller.abort(),
+            4000
+          );
+
+
+        const response =
+          await fetch(
+            API_BASE + "/",
+            {
+              method: "GET",
+              signal: controller.signal
+            }
+          );
+
+
+        clearTimeout(timeout);
+
+
+        if (!response.ok)
+          throw new Error();
+
+
+        statusDot.className =
+          "status-dot online";
+
+        statusText.textContent =
+          "API connected";
+
+
+      } catch (error) {
+
+        statusDot.className =
+          "status-dot offline";
+
+        statusText.textContent =
+          "API offline";
+
+      }
+
+    }
+
+
+    checkAPI();
+
+
+    /* =========================================================
+       SHOW STATES
+    ========================================================= */
+
+    function showIdle() {
+
+      idleState.style.display =
+        "flex";
+
+      loadingState.classList.remove(
+        "show"
+      );
+
+      errorState.classList.remove(
+        "show"
+      );
+
+      resultContent.classList.remove(
+        "show"
+      );
+
+    }
+
+
+    function showLoading() {
+
+      idleState.style.display =
+        "none";
+
+      errorState.classList.remove(
+        "show"
+      );
+
+      resultContent.classList.remove(
+        "show"
+      );
+
+      loadingState.classList.add(
+        "show"
+      );
+
+    }
+
+
+    function showError() {
+
+      idleState.style.display =
+        "none";
+
+      loadingState.classList.remove(
+        "show"
+      );
+
+      resultContent.classList.remove(
+        "show"
+      );
+
+      errorState.classList.add(
+        "show"
+      );
+
+    }
+
+
+    function showResult() {
+
+      idleState.style.display =
+        "none";
+
+      loadingState.classList.remove(
+        "show"
+      );
+
+      errorState.classList.remove(
+        "show"
+      );
+
+      resultContent.classList.add(
+        "show"
+      );
+
+    }
+
+
+    /* =========================================================
+       RENDER RESULT
+    ========================================================= */
+
+    function renderResult(data) {
+
+      const prediction =
+        data.Predicted_room_type;
+
+
+      const probabilities =
+        data.Prediction_probability;
+
+
+      /*
+       * The backend currently returns the probability
+       * array in model.classes_ order.
+       *
+       * Your existing frontend defines this order as:
+       */
+
+      const classes = [
+        "Entire home/apt",
+        "Private room",
+        "Shared room"
+      ];
+
+
+      $("prediction").textContent =
+        prediction || "Unknown";
+
+
+      if (
+        !Array.isArray(probabilities) ||
+        probabilities.length === 0
+      ) {
+
+        $("confidence").textContent =
+          "—";
+
+        return;
+
+      }
+
+
+      const percentages =
+        probabilities.map(
+          value =>
+            Number(value) * 100
+        );
+
+
+      const max =
+        Math.max(...percentages);
+
+
+      $("confidence").textContent =
+        max.toFixed(1) + "%";
+
+
+      /*
+       * Confidence bar
+       */
+
+      setTimeout(() => {
+
+        $("confidenceBar").style.width =
+          Math.min(max, 100) + "%";
+
+      }, 80);
+
+
+      /*
+       * Probability bars
+       */
+
+      for (
+        let i = 0;
+        i < 3;
+        i++
+      ) {
+
+        const value =
+          percentages[i] || 0;
+
+
+        $("prob" + i).textContent =
+          value.toFixed(1) + "%";
+
+
+        setTimeout(() => {
+
+          $("bar" + i).style.width =
+            Math.min(value, 100) + "%";
+
+        }, 100);
+
+      }
+
+    }
+
+
+    /* =========================================================
+       SUBMIT
+    ========================================================= */
+
+    form.addEventListener(
+      "submit",
+      async event => {
+
+        event.preventDefault();
+
+
+        generalError.classList.remove(
+          "show"
+        );
+
+        generalError.textContent =
+          "";
+
+
+        const payload =
+          buildPayload();
+
+
+        if (!validate(payload)) {
+
+          return;
+
+        }
+
+
+        /*
+         * Loading
+         */
+
+        showLoading();
+
+
+        predictBtn.disabled =
+          true;
+
+        predictBtn.classList.add(
+          "loading"
+        );
+
+        buttonText.textContent =
+          "Predicting...";
+
+
+        try {
+
+          const response =
+            await fetch(
+              API_BASE + "/predict",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify(
+                    payload
+                  )
+              }
+            );
+
+
+          if (!response.ok) {
+
+            let message =
+              "The model rejected the request.";
+
+
+            try {
+
+              const errorData =
+                await response.json();
+
+
+              if (errorData.detail) {
+
+                if (
+                  Array.isArray(
+                    errorData.detail
+                  )
+                ) {
+
+                  message =
+                    errorData.detail
+                      .map(
+                        item =>
+                          item.msg
+                      )
+                      .join(" • ");
+
+                } else {
+
+                  message =
+                    errorData.detail;
+
+                }
+
+              }
+
+            } catch (e) { }
+
+
+            throw new Error(
+              message
+            );
+
+          }
+
+
+          const data =
+            await response.json();
+
+
+          renderResult(data);
+
+          showResult();
+
+
+        } catch (error) {
+
+          console.error(
+            "Prediction error:",
+            error
+          );
+
+
+          showError();
+
+
+          generalError.textContent =
+            error.message ||
+            "Couldn't reach the FastAPI server.";
+
+
+          generalError.classList.add(
+            "show"
+          );
+
+
+        } finally {
+
+          predictBtn.disabled =
+            false;
+
+          predictBtn.classList.remove(
+            "loading"
+          );
+
+          buttonText.textContent =
+            "Reveal room type →";
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       RETRY
+    ========================================================= */
+
+    $("retryBtn").addEventListener(
+      "click",
+      () => {
+
+        checkAPI();
+
+        showIdle();
+
+      }
+    );
+
+
+    /* =========================================================
+       CLEAR ERRORS WHILE TYPING
+    ========================================================= */
+
+    [
+      "latitude",
+      "longitude",
+      "price",
+      "minimum_nights",
+      "number_of_reviews",
+      "reviews_per_month",
+      "calculated_host_listings_count",
+      "availability_365",
+      "neighbourhood"
+    ]
+      .forEach(id => {
+
+        const element =
+          $(id);
+
+
+        element.addEventListener(
+          "input",
+          () => {
+
+            clearFieldError(id);
+
+            generalError.classList.remove(
+              "show"
+            );
+
+          }
+        );
+
+      });
+
+
+  </script>
+
+</body>
+
+</html>
